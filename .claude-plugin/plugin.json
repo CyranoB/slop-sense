@@ -1,0 +1,12 @@
+{
+  "name": "slop-sense",
+  "description": "Detect and rewrite AI-generated text. Runs an algorithmic SLOP scorer (0-100) and identifies 24 AI writing patterns, then rewrites text to sound human.",
+  "version": "1.0.0",
+  "author": {
+    "name": "CyranoB"
+  },
+  "homepage": "https://github.com/CyranoB/slop-sense",
+  "repository": "https://github.com/CyranoB/slop-sense",
+  "license": "MIT",
+  "keywords": ["ai-detection", "slop-score", "humanizer", "writing"]
+}
