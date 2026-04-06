@@ -13,7 +13,7 @@ fi
 
 # 2. npx (downloads on the fly, no install needed)
 if command -v npx &>/dev/null; then
-  exec npx -y slop-score "$@"
+  exec npx -y -p slop-detector slop-score "$@"
 fi
 
 echo "SCORER_NOT_AVAILABLE" >&2
