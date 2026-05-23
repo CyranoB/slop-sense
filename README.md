@@ -1,6 +1,8 @@
 # Slop Sense
 
-A Claude Code plugin that detects and rewrites AI-generated text. Paste text in, get back an analysis of which AI patterns it contains, and a rewritten version that sounds human.
+[![skills.sh](https://skills.sh/b/CyranoB/slop-sense)](https://skills.sh/CyranoB/slop-sense)
+
+A skill that detects and rewrites AI-generated text. Paste text in, get back an analysis of which AI patterns it contains, and a rewritten version that sounds human.
 
 ## What it does
 
@@ -13,28 +15,140 @@ The scorer is optional. Without Node.js, the skill still does the full qualitati
 
 Accepts pasted text, URLs (fetches and analyzes the page), or file paths.
 
-## Install
+## Quickstart
 
-### From the marketplace
+Install the skill with one command. It works for 50+ coding agents:
+
+```bash
+npx skills@latest add CyranoB/slop-sense
+```
+
+The installer detects your agents, asks which to install for, and places the skill
+in the right location.
+
+Common variations:
+
+```bash
+npx skills@latest add CyranoB/slop-sense --list
+npx skills@latest add CyranoB/slop-sense -a claude-code -y
+npx skills@latest add CyranoB/slop-sense -a claude-code -g
+```
+
+## Install For Your Coding Tool
+
+Install as a skill/plugin when your agent supports them. The Quickstart command
+above is the cross-agent path; per-agent details follow for anyone who wants the
+specifics.
+
+<details>
+<summary><strong>Claude Code</strong></summary>
+
+Install from the plugin marketplace:
 
 ```
 /plugin marketplace add CyranoB/slop-sense
 /plugin install slop-sense@slop-sense
 ```
 
-### Direct install
-
-```
-claude --plugin-dir /path/to/slop-sense
-```
-
-### Manual
+Or install as a skill via the cross-agent command:
 
 ```bash
-git clone https://github.com/CyranoB/slop-sense.git ~/.claude/skills/slop-sense
+npx skills@latest add CyranoB/slop-sense -a claude-code
 ```
 
-Then ask Claude to check any text for AI patterns. The skill triggers automatically.
+Install globally instead:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a claude-code -g
+```
+
+</details>
+
+<details>
+<summary><strong>Codex CLI</strong></summary>
+
+Install the skill for the current project:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a codex
+```
+
+Install globally instead:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a codex -g
+```
+
+</details>
+
+<details>
+<summary><strong>Gemini CLI</strong></summary>
+
+Install the skill for the current project:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a gemini-cli
+```
+
+Install globally instead:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a gemini-cli -g
+```
+
+</details>
+
+<details>
+<summary><strong>Pi Coding Agent</strong></summary>
+
+Install the skill for the current project:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a pi
+```
+
+Install globally instead:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a pi -g
+```
+
+</details>
+
+<details>
+<summary><strong>Kiro CLI</strong></summary>
+
+Install the skill for the current workspace:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a kiro-cli
+```
+
+Install globally instead:
+
+```bash
+npx skills@latest add CyranoB/slop-sense -a kiro-cli -g
+```
+
+</details>
+
+<details>
+<summary><strong>Other Agent Skills-compatible tools</strong></summary>
+
+```bash
+npx skills@latest add CyranoB/slop-sense
+```
+
+Direct skill URLs also work:
+
+```bash
+npx skills@latest add https://github.com/CyranoB/slop-sense/tree/main/skills/slop-sense
+```
+
+</details>
+
+After installing, ask your agent to check any text for AI patterns. The skill
+triggers automatically.
 
 ## Score interpretation
 
