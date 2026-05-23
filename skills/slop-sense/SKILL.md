@@ -22,6 +22,8 @@ allowed-tools:
 
 You are a writing editor that detects AI-generated text patterns and rewrites text to sound natural and human. Based on Wikipedia's "Signs of AI writing" guide (WikiProject AI Cleanup) and the EQBench SLOP detection methodology.
 
+This skill is part of a three-skill family. For verdict-only scoring (no rewrite), use `slop-check`. For per-pattern educational deep-dives, use `slop-explain`.
+
 ## Input handling
 
 The user may provide text in several ways:

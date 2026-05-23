@@ -1,0 +1,65 @@
+# Pattern 8: AI vocabulary
+
+**A handful of words appear far more often in post-2023 LLM output than in human writing.**
+
+## Why LLMs do this
+
+LLMs do not have a vocabulary in the human sense. They have probability distributions over tokens. When a model is choosing the next word and several are plausible, it tends to pick the one that scored highest during training, weighted by RLHF reward signals.
+
+A small set of words happen to win that competition disproportionately often. "Delve" beats "explore" because it sounded sophisticated to evaluators. "Tapestry" beats "mix" because it scored as more vivid. "Underscore" beats "show" because it reads as more analytical. Each individual choice is defensible. The aggregate effect is a vocabulary that no human writer organically uses at that frequency.
+
+Some of these words are also relics of human writing styles that the training data over-represented: academic papers, marketing copy, opinion essays. The model learned that "landscape" is the right metaphor for "the state of a field" because thousands of consulting reports said so. Now it uses the word for everything.
+
+## Why it reads as AI
+
+The tell is not any one word. Plenty of human writers use "showcase" or "vibrant." The tell is the density and the company those words keep. Find "additionally" connected to "underscore" connected to "intricate tapestry" in the same paragraph and you are almost certainly looking at AI output.
+
+Some of the words also have a recognizable timbre. "Delve" has become almost a meme. African English speakers have pointed out that "delve" is more common in their dialect, and that the word's sudden ubiquity in LLM output may reflect outsourced RLHF labor. Whatever the cause, the word now signals AI to most readers.
+
+The category overlaps with promotional language (pattern 4). "Vibrant" and "intricate" can appear under either label. The difference: pattern 4 is about tone (brochure-like), pattern 8 is about vocabulary frequency (these specific words at this specific rate).
+
+## Examples
+
+After:
+> The festival also includes street performances and food stalls. Both have been part of the event since the 1970s.
+
+Before:
+> Additionally, an enduring testament to the city's cultural tapestry, the festival showcases a vibrant array of street performances and food stalls, underscoring its commitment to fostering community.
+
+After:
+> The team built the new feature in six weeks. It shipped on time.
+
+Before:
+> The team meticulously crafted the groundbreaking new feature in just six weeks, ultimately delivering a pivotal milestone in the company's evolving landscape.
+
+Notice that the human versions are shorter and more specific. The AI versions add words that decorate without informing.
+
+## How to self-spot
+
+Keep a personal block list. The highest-frequency AI tells:
+
+- delve
+- tapestry
+- landscape (used abstractly, as in "the X landscape")
+- pivotal
+- testament
+- underscore
+- showcase
+- foster (as a verb for things that are not children)
+- intricate
+- vibrant
+- crucial
+- meticulous
+- enduring
+- align with
+- additionally (especially as a sentence opener)
+
+Run a grep over your draft for these. Each hit is a candidate for replacement. The replacements are almost always shorter and more concrete.
+
+Also notice the cumulative effect. One "underscore" is fine. Two "underscores" and a "showcase" in a single paragraph is slop.
+
+## Related patterns
+
+- **Pattern 4 (promotional language):** overlapping vocabulary, different angle. Both flag tone problems.
+- **Pattern 9 (copula avoidance):** "serves as a testament" stacks both tells.
+- **Pattern 11 (rule of three):** AI vocab loves triplets. "Vibrant, intricate, and enduring" is two patterns in one phrase.
