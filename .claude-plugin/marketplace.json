@@ -10,8 +10,8 @@
     {
       "name": "slop-sense",
       "source": "./",
-      "description": "Detect and rewrite AI-generated text. Runs an algorithmic SLOP scorer (0-100) and identifies 33 AI writing patterns, then rewrites text to sound human. Includes ai;dr mode to extract the probable prompt from AI-generated text.",
-      "version": "1.2.0",
+      "description": "Detect, score, and explain AI-generated text. Three skills: slop-sense (detect + rewrite + ai;dr), slop-check (score only, no rewrite), slop-explain (per-pattern deep-dives). 33 AI writing patterns, algorithmic SLOP scorer (0-100).",
+      "version": "2.0.0",
       "author": {
         "name": "CyranoB"
       },

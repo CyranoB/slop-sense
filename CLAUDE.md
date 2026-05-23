@@ -1,24 +1,30 @@
 # Slop Sense
 
-A Claude Code plugin / cross-agent skill that detects AI writing patterns and rewrites text. The skill itself lives at `skills/slop-sense/SKILL.md`; everything else is packaging.
+A Claude Code plugin / cross-agent skill family that detects, scores, and explains AI writing patterns. Three sibling skills ship together inside one plugin.
 
 ## Structure
 
-- `skills/slop-sense/SKILL.md` — the skill (33 patterns, workflow, ai;dr mode). Edit this for behavior changes.
-- `skills/slop-sense/scripts/score.sh` — optional algorithmic scorer wrapper around `npx slop-detector`. Falls back to qualitative-only if Node is missing.
-- `.claude-plugin/plugin.json` — Claude Code plugin manifest. Lists the skill in `skills[]` so `npx skills@latest` can enumerate it.
+- `skills/slop-sense/SKILL.md` — the rewriter (33 patterns, workflow, ai;dr mode). Edit this for rewrite-behavior changes.
+- `skills/slop-sense/scripts/score.sh` — optional algorithmic scorer wrapper around `npx slop-detector`. Falls back to qualitative-only if Node is missing. Reused by `slop-check` via the sibling path `../slop-sense/scripts/score.sh`.
+- `skills/slop-check/SKILL.md` — verdict-only skill (no rewrite). Compact 33-pattern reference table inline. Allowed-tools deliberately exclude Write/Edit.
+- `skills/slop-explain/SKILL.md` — per-pattern educational skill. Resolves user request to a pattern number 1-33 via the lookup table, then reads the matching `patterns/NN-name.md` file.
+- `skills/slop-explain/patterns/` — 33 per-pattern deep-dive files (`01-significance-inflation.md` through `33-generic-positive-conclusions.md`). One file per pattern; each follows the same template (one-line summary, Why LLMs do this, Why it reads as AI, Examples, How to self-spot, Related patterns).
+- `.claude-plugin/plugin.json` — plugin manifest. Lists all three skills in `skills[]` so `npx skills@latest` can enumerate them together.
 - `.claude-plugin/marketplace.json` — marketplace listing. Duplicates `version` and metadata from `plugin.json`.
-- `scripts/link-skills.sh` — dogfooding helper; symlinks `skills/slop-sense` into `~/.claude/skills` (override with `SKILLS_DEST`).
+- `scripts/link-skills.sh` — dogfooding helper; auto-discovers every `SKILL.md` under `skills/` and symlinks each into `~/.claude/skills` (override with `SKILLS_DEST`).
 
 ## When making changes
 
 - **Bump `version` in BOTH `plugin.json` and `marketplace.json`** for any user-visible change. Claude Code uses `version` as the update cache key — installs report "already latest" without a bump.
-- The skill is distributed two ways: marketplace install (Claude Code only) and `npx skills@latest add CyranoB/slop-sense` (50+ agents). Don't add Claude-specific paths in `SKILL.md` — it has to work cross-agent.
-- The scorer is optional by design. Don't make `score.sh` a hard dependency; the skill must still do useful qualitative analysis when Node is unavailable.
-- No build, no tests, no lint. Verification = read the diff and try the skill in a session.
+- The plugin is distributed two ways: marketplace install (Claude Code only) and `npx skills@latest add CyranoB/slop-sense` (50+ agents). Don't add Claude-specific paths in any SKILL.md — they have to work cross-agent.
+- **Trigger disambiguation matters.** All three skills share vocabulary domain. When editing any SKILL.md description, keep the "Prefer X if..." cross-references intact so the agent's router picks the right skill.
+- The scorer is optional by design. Don't make `score.sh` a hard dependency; the skills must still do useful qualitative analysis when Node is unavailable.
+- The `slop-check` skill calls the scorer via the sibling path `../slop-sense/scripts/score.sh`. If a cross-agent install ever flattens directory structure such that the relative path breaks, vendor a per-skill copy inside `slop-check/scripts/` rather than refactoring the path scheme.
+- Pattern numbering (1-33) is the load-bearing convention across all three skills. Adding a new pattern means editing all three skills (slop-sense catalog, slop-check reference table, slop-explain lookup table + new deep-dive file).
+- No build, no tests, no lint. Verification = read the diff, run `bash scripts/link-skills.sh`, and try each skill in a session.
 
 ## Release flow
 
-1. Edit `SKILL.md` / scripts.
+1. Edit `SKILL.md` files / scripts / deep-dives.
 2. Bump `version` in `plugin.json` AND `marketplace.json` (same value).
 3. Commit, PR to `main`. The marketplace picks up the new version on push.

@@ -2,9 +2,19 @@
 
 [![skills.sh](https://skills.sh/b/CyranoB/slop-sense)](https://skills.sh/CyranoB/slop-sense)
 
-A skill that detects and rewrites AI-generated text. Paste text in, get back an analysis of which AI patterns it contains, and a rewritten version that sounds human.
+A three-skill plugin that detects, scores, and explains AI-generated text. Paste text in, get back an analysis of which AI patterns it contains, a rewritten version that sounds human, or a deep-dive on a specific pattern you want to understand.
 
-## What it does
+## The three skills
+
+| Skill | Use when you want to... | Output |
+|---|---|---|
+| `slop-sense` | Rewrite AI text to sound human | score + named patterns + draft + audit + final rewrite |
+| `slop-check` | Just score the text, no rewrite | score + named patterns + one-line evidence per pattern |
+| `slop-explain` | Learn why a specific pattern is a tell | per-pattern deep-dive (why LLMs do it, why it reads as AI, how to self-spot) |
+
+All three share the same 33-pattern catalog and the same algorithmic scorer. They differ in workflow and output.
+
+## What slop-sense does
 
 1. Runs the [slop-detector](https://github.com/CyranoB/slop-detector) algorithmic scorer via `npx` (no install needed, just Node.js). Returns a 0-100 SLOP score with specific word hits, trigram matches, and contrast patterns found.
 2. Scans for 33 qualitative AI writing patterns: significance inflation, promotional language, AI vocabulary, copula avoidance, em dash overuse, sycophantic tone, invented concept labels, rhetorical Q&A, false vulnerability, and more.
@@ -14,6 +24,18 @@ A skill that detects and rewrites AI-generated text. Paste text in, get back an 
 The scorer is optional. Without Node.js, the skill still does the full qualitative analysis and rewrite.
 
 Accepts pasted text, URLs (fetches and analyzes the page), or file paths.
+
+## What slop-check does
+
+A read-only verdict skill for when you want a score but plan to fix the text yourself (or run it in CI). Same input handling, same 33-pattern scan, same algorithmic scorer. Output is a compact table of patterns found with one-line evidence per pattern, plus the verdict band. No rewrite, no audit, no edits to your text.
+
+Triggers on requests like "score this," "rate this text," "how AI is this," "verdict only," "don't rewrite, just check."
+
+## What slop-explain does
+
+A teaching skill. Ask "explain pattern 17" or "why is the rule of three a tell" and get a deep-dive on that single pattern: why LLMs produce it, why it reads as AI to a reader, two or three example rewrites, and a checklist for spotting the pattern in your own writing. Pairs naturally with `slop-check` — check flags pattern #17, explain teaches you why it matters.
+
+Triggers on requests like "explain pattern N," "why is X a tell," "teach me about em dash overuse."
 
 ## Quickstart
 
