@@ -23,12 +23,12 @@ After:
 >
 > The team launched three new features and reduced p95 latency by 40%.
 
-Before (with emojis in headings and bullets, rocket and sparkle and lightning and target):
-> ## What We Shipped This Quarter
+Before:
+> ## 🚀 What We Shipped This Quarter
 >
-> - The team launched three new features
-> - Reduced p95 latency by 40%
-> - On track for Q4 goals
+> - ✨ The team launched three new features
+> - ⚡ Reduced p95 latency by 40%
+> - 🎯 On track for Q4 goals
 
 Notice that the human version trusts the structure of headings and prose to do the visual work. The AI version uses emojis to substitute for that structure.
 

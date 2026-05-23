@@ -21,8 +21,8 @@ The pattern is one of the most reliable "ChatGPT did this" tells, more reliable 
 After (straight quotes, the ASCII " character):
 > She said "the meeting was a disaster" and walked out.
 
-Before (curly quotes, the typographic characters):
-> She said "the meeting was a disaster" and walked out.
+Before (curly quotes, the typographic characters U+201C and U+201D):
+> She said “the meeting was a disaster” and walked out.
 
 The shift is subtle visually but obvious to anyone running a script over the text, and to many readers' eyes once they know to look. The left and right typographic quotes are different Unicode characters from the straight double-quote.
 
