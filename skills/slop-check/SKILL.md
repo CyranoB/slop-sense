@@ -41,7 +41,7 @@ The user may provide text in several ways:
    python3 <path-to-skills-root>/slop-sense/scripts/rhythm.py /tmp/slop-check-input.txt
    ```
    `score.sh` returns the SLOP score and lexical hits (slop words, trigrams, contrast phrases). `rhythm.py` returns the structural tells `score.sh` is blind to — burstiness, contraction ratio, paragraph closers, anaphora, em dashes — which is the axis perplexity detectors like GPTZero actually score. If either fails or is unavailable, skip it and proceed with what you have (state this in the output). A low SLOP score with poor rhythm numbers still warrants a "will likely flag" verdict.
-3. **Scan** the text against the 36 patterns in the reference table below. Name every pattern present. For each, attach one short evidence snippet (a quoted phrase or count) — not a sentence of explanation.
+3. **Scan** the text against the 36 patterns in the reference table below. Name every pattern present. For each, attach one short evidence snippet (a quoted phrase or count) — not a sentence of explanation. Scan headings as well as body prose: #10 (negative parallelism, e.g. "A choice, not a fate") and #20 (Title Case) commonly hide there, and `rhythm.py` strips headings so it cannot see them.
 4. **Emit the verdict and stop.** Do not produce a rewrite. Do not offer line-by-line edits. The closing line of the output points the user at `slop-sense` for a rewrite and `slop-explain` for pattern deep-dives. That is the only forward motion this skill provides.
 
 ## Output format
