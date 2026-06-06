@@ -18,13 +18,14 @@ mkdir -p "$STAGE/scripts" "$STAGE/patterns"
 
 cp "$REPO/dist-src/slop-sense-bundle/SKILL.md" "$STAGE/SKILL.md"
 cp "$REPO/skills/slop-sense/scripts/score.sh"  "$STAGE/scripts/score.sh"
+cp "$REPO/skills/slop-sense/scripts/rhythm.py" "$STAGE/scripts/rhythm.py"
 cp "$REPO/skills/slop-explain/patterns/"*.md   "$STAGE/patterns/"
 
 find "$STAGE" -name '.DS_Store' -delete
 
 pattern_count="$(find "$STAGE/patterns" -name '*.md' | wc -l | tr -d ' ')"
-if [ "$pattern_count" -ne 33 ]; then
-  echo "error: expected 33 pattern files, found $pattern_count" >&2
+if [ "$pattern_count" -ne 36 ]; then
+  echo "error: expected 36 pattern files, found $pattern_count" >&2
   exit 1
 fi
 

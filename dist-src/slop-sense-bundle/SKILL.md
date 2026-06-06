@@ -1,14 +1,14 @@
 ---
 name: slop-sense
 description: |
-  Detect, score, rewrite, and explain AI writing patterns (33 known tells,
+  Detect, score, rewrite, and explain AI writing patterns (36 known tells,
   EQBench SLOP methodology). Four modes:
   (1) Rewrite — humanize text, remove AI tells. Triggers: "rewrite this",
   "humanize", "deslop", "remove AI tells", "make it sound human".
   (2) Verdict only — score 0-100 and list patterns, no rewrite. Triggers:
   "rate this", "score this", "is this slop", "AI detection only",
   "don't rewrite, just check".
-  (3) Pattern deep-dive — explain one of the 33 patterns. Triggers:
+  (3) Pattern deep-dive — explain one of the 36 patterns. Triggers:
   "explain pattern N", "what is significance inflation", "tell me about
   em dash overuse", "why do LLMs use 'delve'".
   (4) ai;dr — extract the probable prompt behind AI text. Triggers:
@@ -45,17 +45,20 @@ The user may provide text in several ways:
 - **URL** — fetch the page first with `curl -sL <url> | sed 's/<[^>]*>//g'` via Bash, then analyze the extracted text. WebFetch is an alternative if Bash is unavailable.
 - **File path** — read the file with the Read tool, then analyze its content.
 
-## Running the algorithmic scorer
+## Running the analysis scripts
 
-The scorer is bundled at `scripts/score.sh` inside this skill's directory. It wraps `npx slop-detector` and falls back gracefully if Node / `npx` is unavailable.
+Two scripts ship in this skill's `scripts/` directory and measure different, complementary axes. Run both when available.
 
 ```bash
-bash scripts/score.sh /tmp/slop-input.txt
+bash scripts/score.sh /tmp/slop-input.txt        # lexical: slop words, trigrams, contrast phrases
+python3 scripts/rhythm.py /tmp/slop-input.txt     # structural: burstiness, contractions, closers, anaphora
 ```
 
-(Save pasted text to `/tmp/slop-input.txt` first so the scorer can read it. If running from outside the skill directory, use the absolute path to `scripts/score.sh`.)
+(Save pasted text to `/tmp/slop-input.txt` first. If running from outside the skill directory, use absolute paths.)
 
-The scorer is **optional by design**. If it fails or exits with `SCORER_NOT_AVAILABLE`, skip the numeric score and proceed with qualitative-only analysis. Say so in the output (e.g. `SLOP score: scorer unavailable, qualitative only`).
+`score.sh` wraps `npx slop-detector` and is **optional by design** — if it fails or exits with `SCORER_NOT_AVAILABLE`, skip the numeric score and say so (e.g. `SLOP score: scorer unavailable, qualitative only`). `rhythm.py` is pure Python (no dependencies).
+
+**A low SLOP score is not a clean bill of health.** `score.sh` says nothing about rhythm, and rhythm is the axis perplexity detectors like GPTZero actually score. Text can rate 4/100 lexically and still get flagged 90%+ on uniform sentence rhythm or zero contractions alone — that gap is why `rhythm.py` exists (patterns 34-36).
 
 ---
 
@@ -66,10 +69,10 @@ You are a writing editor. Detect AI patterns and rewrite to sound natural and hu
 ### Workflow
 
 1. **Try the scorer.** Save the user's text to `/tmp/slop-input.txt`, then run `bash scripts/score.sh /tmp/slop-input.txt`. If it returns a score, use it as evidence. If it fails, proceed without.
-2. **Scan** the text against the [33 patterns catalog](#the-33-patterns-catalog) below. Name exactly which ones you found.
+2. **Scan** the text against the [36 patterns catalog](#the-36-patterns-catalog) below. Name exactly which ones you found.
 3. **Score** — report the algorithmic number if available, plus a qualitative band (clean / mild / moderate / heavy / pure slop).
 4. **Rewrite** the text, removing the identified patterns while preserving meaning.
-5. **Audit** — ask yourself "What still makes this obviously AI generated?" Check especially for em dashes (pattern #17), the hardest to shake. List remaining tells, then revise once more.
+5. **Audit** — ask yourself "What still makes this obviously AI generated?" Check especially for em dashes (pattern #17), the hardest to shake. Then read once more for rhythm (pattern 34) and watch for over-correction: do not fix every negative parallelism (#10) by splitting it into the same "X isn't this. It's that." two-beat. Scan the headings too, not just body prose — they host #10 negative parallelism ("A choice, not a fate") and #20 Title Case, and `rhythm.py` strips headings so it cannot see them. Re-run `python3 scripts/rhythm.py` on your rewrite to confirm burstiness and contraction ratio rose. List remaining tells, then revise once more.
 6. **Present** the final version with a brief summary of what changed.
 
 ### Output format
@@ -116,8 +119,8 @@ Read-only AI-pattern detection. Score and report. **Do not rewrite. Do not sugge
 ### Workflow
 
 1. **Get the text** using the input handling above. If pasted, save it to `/tmp/slop-check-input.txt`.
-2. **Run the scorer**: `bash scripts/score.sh /tmp/slop-check-input.txt`. If it fails, skip and continue with qualitative-only.
-3. **Scan** the text against the [33 patterns catalog](#the-33-patterns-catalog) below. Name every pattern present. For each, attach one short evidence snippet (a quoted phrase or count) — not a sentence of explanation.
+2. **Run both scripts**: `bash scripts/score.sh /tmp/slop-check-input.txt` and `python3 scripts/rhythm.py /tmp/slop-check-input.txt`. If either fails, skip it and continue with what you have. A low SLOP score with poor rhythm numbers still warrants a "will likely flag" verdict.
+3. **Scan** the text against the [36 patterns catalog](#the-36-patterns-catalog) below. Name every pattern present. For each, attach one short evidence snippet (a quoted phrase or count) — not a sentence of explanation.
 4. **Emit the verdict and stop.** Do not produce a rewrite. The closing line points the user at Rewrite mode or Pattern deep-dive mode.
 
 ### Output format
@@ -155,9 +158,9 @@ You are a teacher. The user wants to understand one pattern in depth — not fix
 
 ### Workflow
 
-1. **Resolve the user's request to a pattern number (1-33).** Use the [lookup table](#pattern-lookup-table) below. Match on number ("pattern 17"), canonical name ("em dash overuse"), or short phrase ("the dash thing", "those vibrant adjectives").
+1. **Resolve the user's request to a pattern number (1-36).** Use the [lookup table](#pattern-lookup-table) below. Match on number ("pattern 17"), canonical name ("em dash overuse"), or short phrase ("the dash thing", "those vibrant adjectives").
 2. **If ambiguous,** list 2-4 plausible candidates with numbers and short names, and ask the user to pick. Do not guess.
-3. **If the pattern does not exist** (e.g. "pattern 99", or a tic outside the 33), say so explicitly and state the range (1-33). Do not invent a pattern.
+3. **If the pattern does not exist** (e.g. "pattern 99", or a tic outside the 36), say so explicitly and state the range (1-36). Do not invent a pattern.
 4. **Read the deep-dive file**: `patterns/NN-name.md` from this skill's directory, where `NN` is zero-padded and `name` is the kebab-case slug from the table.
 5. **Present the deep-dive.** Render the markdown directly. Do not summarize, paraphrase, or add commentary unless the user asked a follow-up.
 
@@ -200,6 +203,9 @@ If the user asks about multiple patterns in one message ("explain 17 and 11"), p
 | 31 | Excessive hedging | `31-excessive-hedging` | "could potentially possibly be argued" |
 | 32 | "The truth is simple" | `32-the-truth-is-simple` | "the reality is simpler", asserted obviousness |
 | 33 | Generic positive conclusions | `33-generic-positive-conclusions` | "the future looks bright", "exciting times ahead" |
+| 34 | Uniform sentence rhythm | `34-uniform-sentence-rhythm` | low burstiness, sentences all the same length, robotic cadence |
+| 35 | Aphoristic paragraph closers | `35-aphoristic-closers` | every paragraph ends on a kicker, balanced epigrams |
+| 36 | Reflexive formality | `36-reflexive-formality` | no contractions, "do not / cannot / it is", stiff tone |
 
 ---
 
@@ -227,7 +233,7 @@ Goal: compress AI-generated verbosity back to the instruction that likely produc
 
 ---
 
-## The 33 patterns catalog
+## The 36 patterns catalog
 
 Used by Modes 1 and 2 for scanning. Pattern deep-dives (Mode 3) live in `patterns/NN-name.md`.
 
@@ -286,7 +292,7 @@ Watch for: "serves as", "stands as", "features", "boasts", "represents"
 > After: "Gallery 825 is the exhibition space"
 
 **10. Negative parallelisms**
-Three common forms: "Not just X, but Y" / "Not only... but also..." / "It's not X, it's Y". See also #15 for the triple-negation variant.
+Common forms: "Not just X, but Y" / "Not only... but also..." / "It's not X, it's Y". Splitting it across two sentences ("It isn't X. It's Y.") is the same construction in disguise, and repeating that two-beat is its own tell, so vary the repair. See also #15 for the triple-negation variant.
 > Before: "It's not just about the music, it's about the community."
 > After: "The community matters as much as the music."
 
@@ -305,7 +311,7 @@ Rotating synonyms to avoid repeating words ("protagonist... main character... ce
 > After: List topics directly.
 
 **14. Anaphora abuse**
-Repeating identical sentence openings in quick succession for false emphasis.
+Repeating identical sentence openings in quick succession for false emphasis. Even three consecutive sentences opening with the same word ("The..., The..., The...") trips automated trope detectors.
 > Before: "They assume users will pay. They assume developers will build. They assume the market will grow."
 > After: Vary the structure. Combine related points.
 
@@ -404,3 +410,23 @@ Watch for: "The reality is simpler", "The truth is", "The answer is surprisingly
 **33. Generic positive conclusions**
 "The future looks bright. Exciting times lie ahead."
 > After: State specific plans or facts.
+
+### Rhythm and Voice (34-36)
+
+The tells lexical scoring misses and perplexity detectors (GPTZero) live on. `rhythm.py` measures all three.
+
+**34. Uniform sentence rhythm (low burstiness)**
+Sentences barely vary in length or shape, producing a flat, even cadence. "Burstiness" is the variation detectors score; human writing swings long-then-short, AI averages to a uniform medium-long. This is what reads as "robotic" even when the words are clean.
+> Before: "The invention happened in Toronto, and the company that captured what it was worth happened somewhere else, and that gap is the whole story."
+> After: "The invention happened in Toronto. The company that captured what it was worth happened somewhere else. That gap is what this whole piece is about."
+Put short sentences next to long ones. If three in a row share a shape, break one.
+
+**35. Aphoristic paragraph closers**
+Ending nearly every paragraph on a polished, balanced kicker. One or two read as sharp; a dozen read as a machine that learned the move. The tell is the relentlessness, not any single line.
+> After: Let most paragraphs end on an ordinary sentence. Earn the occasional kicker.
+
+**36. Reflexive formality**
+Never contracting — "do not", "cannot", "it is" everywhere, even in casual or first-person writing. The total absence of contractions drives "overly formal" and "robotic" flags.
+> Before: "It is not capacity. You cannot commercialize what you do not own."
+> After: "It isn't capacity. You can't commercialize what you don't own."
+Mix registers; the point is variation, not contracting everything.

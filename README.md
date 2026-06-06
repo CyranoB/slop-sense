@@ -12,22 +12,23 @@ A three-skill plugin that detects, scores, and explains AI-generated text. Paste
 | `slop-check` | Just score the text, no rewrite | score + named patterns + one-line evidence per pattern |
 | `slop-explain` | Learn why a specific pattern is a tell | per-pattern deep-dive (why LLMs do it, why it reads as AI, how to self-spot) |
 
-All three share the same 33-pattern catalog and the same algorithmic scorer. They differ in workflow and output.
+All three share the same 36-pattern catalog and the same scoring scripts. They differ in workflow and output.
 
 ## What slop-sense does
 
 1. Runs the [slop-detector](https://github.com/CyranoB/slop-detector) algorithmic scorer via `npx` (no install needed, just Node.js). Returns a 0-100 SLOP score with specific word hits, trigram matches, and contrast patterns found.
-2. Scans for 33 qualitative AI writing patterns: significance inflation, promotional language, AI vocabulary, copula avoidance, em dash overuse, sycophantic tone, invented concept labels, rhetorical Q&A, false vulnerability, and more.
-3. Rewrites the text with a two-pass process: draft, then an anti-AI audit that catches what the first pass missed.
-4. **ai;dr mode**: extracts the probable prompt that generated a piece of AI text, with an inflation ratio showing how many words the AI used to say something simple.
+2. Runs a bundled rhythm checker (`rhythm.py`, pure Python, no dependencies) that measures what the SLOP scorer can't: sentence-length variation (burstiness), contraction ratio, aphoristic paragraph closers, and anaphora. These are the structural tells perplexity detectors like GPTZero score, and a text can rate "very human" on SLOP while failing badly here.
+3. Scans for 36 qualitative AI writing patterns: significance inflation, promotional language, AI vocabulary, copula avoidance, em dash overuse, sycophantic tone, invented concept labels, rhetorical Q&A, false vulnerability, uniform sentence rhythm (low burstiness), and more.
+4. Rewrites the text with a two-pass process: draft, then an anti-AI audit that catches what the first pass missed.
+5. **ai;dr mode**: extracts the probable prompt that generated a piece of AI text, with an inflation ratio showing how many words the AI used to say something simple.
 
-The scorer is optional. Without Node.js, the skill still does the full qualitative analysis and rewrite.
+Both scripts are optional. The SLOP scorer needs Node.js; the rhythm checker needs only Python 3. Without either, the skill still does the full qualitative analysis and rewrite.
 
 Accepts pasted text, URLs (fetches and analyzes the page), or file paths.
 
 ## What slop-check does
 
-A read-only verdict skill for when you want a score but plan to fix the text yourself (or run it in CI). Same input handling, same 33-pattern scan, same algorithmic scorer. Output is a compact table of patterns found with one-line evidence per pattern, plus the verdict band. No rewrite, no audit, no edits to your text.
+A read-only verdict skill for when you want a score but plan to fix the text yourself (or run it in CI). Same input handling, same 36-pattern scan, same scoring scripts (lexical + rhythm). Output is a compact table of patterns found with one-line evidence per pattern, plus the verdict band. No rewrite, no audit, no edits to your text.
 
 Triggers on requests like "score this," "rate this text," "how AI is this," "verdict only," "don't rewrite, just check."
 
@@ -184,7 +185,7 @@ triggers automatically.
 
 Anything above 30 is worth a second look.
 
-## The 33 patterns
+## The 36 patterns
 
 The skill checks for these AI writing tells, grouped by category:
 
@@ -197,6 +198,8 @@ The skill checks for these AI writing tells, grouped by category:
 **Communication** (23-29): chatbot artifacts, knowledge-cutoff disclaimers, sycophantic tone, "here's the kicker" false suspense, "think of it as..." patronizing analogies, "imagine a world where..." futurism, false vulnerability
 
 **Filler** (30-33): filler phrases, excessive hedging, "the truth is simple" assertions, generic positive conclusions
+
+**Rhythm and Voice** (34-36): uniform sentence rhythm (low burstiness), aphoristic paragraph closers, reflexive formality (contraction avoidance). These are the tells lexical scorers miss and perplexity detectors like GPTZero live on; the bundled `rhythm.py` measures them.
 
 Based on [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), the [EQBench SLOP score](https://eqbench.com/slop-score.html) methodology, and [tropes.fyi](https://tropes.fyi/).
 

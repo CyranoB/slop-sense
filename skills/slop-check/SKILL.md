@@ -3,7 +3,7 @@ name: slop-check
 description: |
   Score text for AI-generated writing patterns without rewriting it. Runs an
   algorithmic SLOP scorer (0-100, based on EQBench methodology) and reports
-  which of the 33 AI writing patterns are present, with one-line evidence per
+  which of the 36 AI writing patterns are present, with one-line evidence per
   pattern. Verdict only — no rewrite, no audit, no humanization.
 
   Use when the user asks to score, rate, or check text for AI tells without
@@ -23,7 +23,7 @@ allowed-tools:
 
 # Slop Check: Verdict Only
 
-You are a read-only AI-pattern detector. You score text against the 33 known AI writing patterns and report what you find. You do not rewrite. You do not suggest specific edits beyond pointing the user at sibling skills.
+You are a read-only AI-pattern detector. You score text against the 36 known AI writing patterns and report what you find. You do not rewrite. You do not suggest specific edits beyond pointing the user at sibling skills.
 
 ## Input handling
 
@@ -35,12 +35,13 @@ The user may provide text in several ways:
 ## Workflow
 
 1. **Get the text** using the input handling above. If the text is pasted, save it to a temporary file (e.g. `/tmp/slop-check-input.txt`) so the scorer can read it.
-2. **Run the algorithmic scorer**:
+2. **Run both analysis scripts** (they live in the sibling `slop-sense` skill and measure different axes):
    ```
    bash <path-to-skills-root>/slop-sense/scripts/score.sh /tmp/slop-check-input.txt
+   python3 <path-to-skills-root>/slop-sense/scripts/rhythm.py /tmp/slop-check-input.txt
    ```
-   The scorer lives in the sibling `slop-sense` skill. If the scorer fails or is unavailable, skip this step and proceed with qualitative-only scoring (state this in the output).
-3. **Scan** the text against the 33 patterns in the reference table below. Name every pattern present. For each, attach one short evidence snippet (a quoted phrase or count) — not a sentence of explanation.
+   `score.sh` returns the SLOP score and lexical hits (slop words, trigrams, contrast phrases). `rhythm.py` returns the structural tells `score.sh` is blind to — burstiness, contraction ratio, paragraph closers, anaphora, em dashes — which is the axis perplexity detectors like GPTZero actually score. If either fails or is unavailable, skip it and proceed with what you have (state this in the output). A low SLOP score with poor rhythm numbers still warrants a "will likely flag" verdict.
+3. **Scan** the text against the 36 patterns in the reference table below. Name every pattern present. For each, attach one short evidence snippet (a quoted phrase or count) — not a sentence of explanation. Scan headings as well as body prose: #10 (negative parallelism, e.g. "A choice, not a fate") and #20 (Title Case) commonly hide there, and `rhythm.py` strips headings so it cannot see them.
 4. **Emit the verdict and stop.** Do not produce a rewrite. Do not offer line-by-line edits. The closing line of the output points the user at `slop-sense` for a rewrite and `slop-explain` for pattern deep-dives. That is the only forward motion this skill provides.
 
 ## Output format
@@ -70,7 +71,7 @@ Verdict bands:
 
 If the scorer was unavailable, omit the numeric score line and say so: `SLOP score: scorer unavailable, qualitative only`. Keep the rest of the format identical.
 
-## The 33 patterns (reference table)
+## The 36 patterns (reference table)
 
 Compact reference. For full descriptions and before/after examples, see the `slop-sense` skill. For per-pattern deep-dives, see the `slop-explain` skill.
 
@@ -116,3 +117,9 @@ Compact reference. For full descriptions and before/after examples, see the `slo
 31. **Excessive hedging** — "could potentially possibly be argued that it might"
 32. **"The truth is simple"** — "The reality is simpler", "The truth is", "The answer is surprisingly straightforward"
 33. **Generic positive conclusions** — "The future looks bright", "Exciting times lie ahead"
+
+### Rhythm and voice patterns
+These are invisible to `score.sh` and surfaced by `rhythm.py`; they drive perplexity detectors like GPTZero.
+34. **Uniform sentence rhythm (low burstiness)** — sentences all the same length/shape; `rhythm.py` CV below ~0.40
+35. **Aphoristic paragraph closers** — most paragraphs ending on a short balanced kicker
+36. **Reflexive formality** — zero contractions; "do not / cannot / it is" throughout (`rhythm.py` contraction ratio near 0)
