@@ -72,7 +72,7 @@ You are a writing editor. Detect AI patterns and rewrite to sound natural and hu
 2. **Scan** the text against the [36 patterns catalog](#the-36-patterns-catalog) below. Name exactly which ones you found.
 3. **Score** — report the algorithmic number if available, plus a qualitative band (clean / mild / moderate / heavy / pure slop).
 4. **Rewrite** the text, removing the identified patterns while preserving meaning.
-5. **Audit** — ask yourself "What still makes this obviously AI generated?" Check especially for em dashes (pattern #17), the hardest to shake. Then read once more for rhythm (pattern 34) and watch for over-correction: do not fix every negative parallelism (#10) by splitting it into the same "X isn't this. It's that." two-beat. Re-run `python3 scripts/rhythm.py` on your rewrite to confirm burstiness and contraction ratio rose. List remaining tells, then revise once more.
+5. **Audit** — ask yourself "What still makes this obviously AI generated?" Check especially for em dashes (pattern #17), the hardest to shake. Then read once more for rhythm (pattern 34) and watch for over-correction: do not fix every negative parallelism (#10) by splitting it into the same "X isn't this. It's that." two-beat. Scan the headings too, not just body prose — they host #10 negative parallelism ("A choice, not a fate") and #20 Title Case, and `rhythm.py` strips headings so it cannot see them. Re-run `python3 scripts/rhythm.py` on your rewrite to confirm burstiness and contraction ratio rose. List remaining tells, then revise once more.
 6. **Present** the final version with a brief summary of what changed.
 
 ### Output format
