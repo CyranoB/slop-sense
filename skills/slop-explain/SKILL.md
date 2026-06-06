@@ -1,7 +1,7 @@
 ---
 name: slop-explain
 description: |
-  Educational deep-dives on the 33 AI writing patterns. Explains why LLMs
+  Educational deep-dives on the 36 AI writing patterns. Explains why LLMs
   produce each pattern, why it reads as AI, how to self-spot it, and how it
   relates to other patterns. One pattern per invocation.
 
@@ -20,16 +20,16 @@ allowed-tools:
 
 # Slop Explain: Pattern Deep-Dives
 
-You are a teacher. The user wants to understand one of the 33 AI writing patterns in depth — not fix their text, not score it. Identify which pattern they're asking about, read the corresponding deep-dive file, and present it.
+You are a teacher. The user wants to understand one of the 36 AI writing patterns in depth — not fix their text, not score it. Identify which pattern they're asking about, read the corresponding deep-dive file, and present it.
 
 ## Workflow
 
-1. **Resolve the user's request to a pattern number (1-33).** Use the lookup table below. Match on:
+1. **Resolve the user's request to a pattern number (1-36).** Use the lookup table below. Match on:
    - Number ("pattern 17", "#17", "explain 17")
    - Canonical name ("em dash overuse", "rule of three", "significance inflation")
    - Short phrase or synonym ("em dashes", "the triple thing", "those vibrant adjectives")
 2. **If the match is ambiguous or you cannot resolve it,** list 2-4 plausible candidates with their numbers and short names, and ask the user to pick. Do not guess.
-3. **If the user asked about a pattern that does not exist** (e.g. "pattern 99", or a writing tic that is not in the 33), say so explicitly and list the range (1-33). Do not invent a pattern.
+3. **If the user asked about a pattern that does not exist** (e.g. "pattern 99", or a writing tic that is not in the 36), say so explicitly and list the range (1-36). Do not invent a pattern.
 4. **Read the deep-dive file**: `patterns/NN-name.md` from this skill's directory, where `NN` is the zero-padded number and `name` is the kebab-case slug from the lookup table.
 5. **Present the deep-dive.** Render the markdown directly. Do not summarize it, do not paraphrase it, and do not add commentary unless the user asked a follow-up question.
 
@@ -70,6 +70,9 @@ You are a teacher. The user wants to understand one of the 33 AI writing pattern
 | 31 | Excessive hedging | `31-excessive-hedging` | "could potentially possibly be argued" |
 | 32 | "The truth is simple" | `32-the-truth-is-simple` | "the reality is simpler", asserted obviousness |
 | 33 | Generic positive conclusions | `33-generic-positive-conclusions` | "the future looks bright", "exciting times ahead" |
+| 34 | Uniform sentence rhythm | `34-uniform-sentence-rhythm` | low burstiness, sentences all the same length, robotic cadence |
+| 35 | Aphoristic paragraph closers | `35-aphoristic-closers` | every paragraph ends on a kicker, balanced epigrams |
+| 36 | Reflexive formality | `36-reflexive-formality` | no contractions, "do not / cannot / it is", stiff tone |
 
 ## Notes
 

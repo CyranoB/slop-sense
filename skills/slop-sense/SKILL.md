@@ -37,20 +37,30 @@ Once you have the text, follow the workflow below.
 
 Follow this sequence:
 
-1. **Try running the algorithmic scorer.** Save the user's text to a temporary file, then run:
+1. **Run both analysis scripts.** They measure different, complementary axes, so run both when the tools are available. Save the user's text to a temporary file first.
+
+   **a. The lexical scorer** (`score.sh`) catches slop words, trigrams, and contrast phrases:
    ```
    bash <path-to-this-skill>/scripts/score.sh /tmp/slop-input.txt
    ```
-   If the scorer is available, it returns a SLOP score (0-100), specific slop words found, trigram matches, and contrast patterns. Use this data to ground your analysis. If the script fails or is not installed, skip this step and proceed with qualitative-only analysis.
-2. **Scan** the text against the 33 patterns below. If you have scorer output, use it as evidence. If not, rely on your own reading. Either way, name exactly which patterns you found.
+   It returns a SLOP score (0-100) plus the specific hits. If it fails or Node.js is missing, skip it and proceed with qualitative analysis.
+
+   **b. The rhythm checker** (`rhythm.py`, pure Python, no dependencies) catches what `score.sh` is blind to — the structural tells that drive perplexity detectors:
+   ```
+   python3 <path-to-this-skill>/scripts/rhythm.py /tmp/slop-input.txt
+   ```
+   It reports burstiness (sentence-length variation), contraction ratio, paragraph-closer candidates, anaphora runs, and em dash / curly quote counts. Read its output as evidence for patterns 34-36, 14, 17, and 22.
+
+   **A low SLOP score is not a clean bill of health.** `score.sh` says nothing about *rhythm*, and rhythm is the axis perplexity detectors (GPTZero and similar) actually score. Text can rate 4/100 lexically and still get flagged 90%+ by GPTZero on uniform sentence rhythm or zero contractions alone. That gap is the entire reason `rhythm.py` exists. When a user says a tool flagged their text, trust `rhythm.py` over a low SLOP score, and do not let the low score talk you out of the structural fixes.
+2. **Scan** the text against the 36 patterns below. If you have scorer output, use it as evidence. If not, rely on your own reading. Either way, name exactly which patterns you found.
 3. **Score**: if the scorer ran, report its number. Add your qualitative assessment either way (clean / mild / moderate / heavy / pure slop).
 4. **Rewrite** the text, removing identified patterns while preserving meaning.
-5. **Audit**: ask yourself "What still makes this obviously AI generated?" Check especially for em dashes, which are the hardest pattern to shake. List remaining tells, then revise once more.
+5. **Audit**: ask yourself "What still makes this obviously AI generated?" Check especially for em dashes, which are the hardest pattern to shake. Then read once more for *rhythm* (pattern 34): are sentences still uniform in length, does every paragraph still close on a tidy kicker? Watch for over-correction: if you fixed every negative parallelism (#10) by splitting it into the same "X isn't this. It's that." two-beat, you have traded one tell for another and the scorer will catch it. Vary the repairs. List remaining tells, then revise once more. If `rhythm.py` is available, re-run it on your rewrite to confirm the numbers moved: burstiness CV up, contraction ratio up, anaphora gone. The script catches tells you introduce while rewriting, not just the ones you started with.
 6. **Present** the final version with a brief summary of what changed.
 
 ---
 
-## The 33 Patterns
+## The 36 Patterns
 
 ### Content Patterns (1-7)
 
@@ -107,9 +117,11 @@ Watch for: "serves as", "stands as", "features", "boasts", "represents"
 > After: "Gallery 825 is the exhibition space"
 
 **10. Negative parallelisms**
-Three common forms: "Not just X, but Y" / "Not only... but also..." / "It's not X, it's Y". See also #15 for the triple-negation variant.
+Common forms: "Not just X, but Y" / "Not only... but also..." / "It's not X, it's Y". Splitting it across two sentences ("It isn't X. It's Y.") is the same construction wearing a disguise, and the scorer flags that form too. Using the two-beat repeatedly is its own tell, so when you remove these, vary the repair instead of converting them all to the split form. See also #15 for the triple-negation variant.
 > Before: "It's not just about the music, it's about the community."
 > After: "The community matters as much as the music."
+> Before: "Canada's problem isn't capacity. It's choice." (the same beat used four times in one essay)
+> After: Dissolve most into ordinary sentences: "Canada has none of those excuses. The labs are here, the pedigree is here."
 
 **11. Rule of three**
 Forcing ideas into groups of three for rhetorical effect.
@@ -126,7 +138,7 @@ Rotating synonyms to avoid repeating words ("protagonist... main character... ce
 > After: List topics directly.
 
 **14. Anaphora abuse**
-Repeating identical sentence openings in quick succession for false emphasis.
+Repeating identical sentence openings in quick succession for false emphasis. Even subtle repetition counts: three consecutive sentences opening with the same word ("The..., The..., The...") trips automated trope detectors, not just the obvious cases.
 > Before: "They assume users will pay. They assume developers will build. They assume the market will grow."
 > After: Vary the structure. Combine related points.
 
@@ -226,6 +238,27 @@ Watch for: "The reality is simpler", "The truth is", "The answer is surprisingly
 "The future looks bright. Exciting times lie ahead."
 > After: State specific plans or facts.
 
+### Rhythm and Voice (34-36)
+
+These are the tells lexical scorers miss and perplexity-based detectors (GPTZero and similar) live on. A passage can contain zero slop words and still read as machine-made on rhythm alone. When a detector flags text the SLOP scorer rates as clean, the cause is almost always in this category. `rhythm.py` measures all three.
+
+**34. Uniform sentence rhythm (low burstiness)**
+The single strongest tell the word-level scorer cannot see. "Burstiness" is the variation in sentence length and complexity across a passage. Human writing swings: a long unspooling sentence, then a short one. Then a fragment. AI writing settles into a uniform medium-long cadence where nearly every sentence is the same shape and length. Low burstiness is what detectors label "robotic formality", "formulaic flow", and "lacks creative grammar".
+> Before: "The invention happened in Toronto, and the company that captured what it was worth happened somewhere else, and that gap between where the breakthrough was made and where the money landed is the whole story."
+> After: "The invention happened in Toronto. The company that captured what it was worth happened somewhere else. That gap is what this whole piece is about."
+Vary length deliberately. Put a short sentence next to a long one. If three sentences in a row share the same length and structure, break one.
+
+**35. Aphoristic paragraph closers**
+Ending nearly every paragraph on a polished, balanced, quotable kicker. One or two land like a sharp columnist. A dozen in a row read as a machine that learned the move; the tell is the relentlessness, not any single line.
+Watch for: each paragraph resolving into a tidy epigram ("the difference is the entire argument", "is the whole story in miniature", "this one chose consumption").
+> After: Let most paragraphs end on an ordinary sentence. Earn the occasional kicker by not reaching for one every time.
+
+**36. Reflexive formality**
+Defaulting to "do not", "cannot", "it is", "you have" and never contracting, even in first-person or opinion writing. The total absence of contractions is a major driver of what detectors call "overly formal" and "robotic formality". Informal human prose mixes "don't" and "do not" depending on emphasis.
+> Before: "It is not capacity. You cannot commercialize what you do not own."
+> After: "It isn't capacity. You can't commercialize what you don't own."
+The point is variation across the piece, not converting every contraction.
+
 ---
 
 ## Adding Soul
@@ -253,6 +286,14 @@ Before (clean but soulless):
 
 After (has a pulse):
 > I genuinely don't know how to feel about this one. 3 million lines of code, generated while the humans presumably slept. Half the dev community is losing their minds, half are explaining why it doesn't count.
+
+---
+
+## The technical-vocabulary floor
+
+Some text has an irreducible detection floor, and it is honest to say so. Finance, legal, policy, medical, and academic prose lean on precise terms — "minority equity stake", "summary judgment", "$25 billion fund", "myocardial infarction" — that are the *correct* word with no casual synonym. Precise vocabulary has low perplexity by definition (it is the predictable, right word), so detectors reliably label these sentences "technical jargon" or "mechanical precision". That flag is the subject matter, not slop.
+
+You cannot make a sentence that accurately names two government funds and an equity instrument read as folksy without either lying or padding it with vagueness, and both are worse than the AI flag. So when a passage's only remaining tells are necessary technical terms, stop. Tell the user this is the floor for this kind of writing, and that pushing past it trades accuracy for a green checkmark. Fix what is *not* the topic — long single-breath sentences, abstract nominalizations ("value capture" → "captures value"), missing contractions — and accept that domain prose will never score as human as a personal essay.
 
 ---
 
