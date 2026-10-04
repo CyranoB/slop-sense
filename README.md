@@ -4,15 +4,17 @@
 
 [![skills.sh](https://skills.sh/b/CyranoB/department-of-prose)](https://skills.sh/CyranoB/department-of-prose)
 
-The Department of Prose occupies a small office between what you wrote and what you meant. Its staff were originally employed to remove unnecessary words, but the arrival of artificial intelligence has required a second kettle.
-
-Documents are inspected for inflated importance, unlicensed metaphors, and conclusions which have continued trading after the point has closed. Most can be returned to their owners in working order. Occasionally a paragraph must be taken outside and quietly reduced to a sentence.
+> The Department of Prose occupies a small office between what you wrote and what you meant. Its staff were originally employed to remove unnecessary words, but the arrival of artificial intelligence has required a second kettle.
+>
+> Documents are inspected for inflated importance, unlicensed metaphors, and conclusions which have continued trading after the point has closed. Most can be returned to their owners in working order. Occasionally a paragraph must be taken outside and quietly reduced to a sentence.
 
 A plugin for Claude Code and Codex with three writing skills:
 `slop-check` reviews text, `slop-explain` explains patterns, and
 `slop-sense` rewrites actionable findings. The optional scorer's raw
 measurements stay separate from contextual editorial judgments. Accepts
 pasted text, URLs, or files.
+
+Current plugin version: **3.4.0**.
 
 ## The three skills
 
@@ -27,7 +29,7 @@ The external lexical scorer is separately versioned and optional.
 
 ## What slop-sense does
 
-1. Runs the [slop-detector](https://github.com/CyranoB/slop-detector) algorithmic scorer via `npx` (no install needed, just Node.js). Returns a 0-100 SLOP score with specific word hits, trigram matches, and contrast patterns found.
+1. Runs the [slop-detector](https://github.com/CyranoB/slop-detector) algorithmic scorer using `slop-score` if it is installed on `PATH`; otherwise, uses `npx` to run `slop-detector@1.2.0` (requires Node.js, with no manual installation needed). Returns a 0-100 SLOP score with specific word hits, trigram matches, and contrast patterns found. An installed scorer may differ from the pinned fallback version.
 2. Runs a bundled rhythm checker (`rhythm.py`, pure Python, no dependencies) that measures sentence-length variation, contraction ratio, paragraph-closer candidates, anaphora, raw punctuation counts, and prose punctuation-cadence candidates. These are descriptive measurements.
 3. Assesses 36 numbered editorial patterns using the catalogue's source, scope, and false-positive guard. A raw match can remain clean.
 4. Rewrites actionable findings with a draft, fact-preservation check, final revision, and a compact before/after verification on the settled text.
@@ -37,12 +39,18 @@ Both scripts are optional. The SLOP scorer needs Node.js; the rhythm checker nee
 
 Accepts pasted text, URLs (fetches and analyzes the page), or file paths.
 
+Markdown and HTML prose extraction is still incomplete: link destinations and
+other non-prose content can affect measurements. See [#8](https://github.com/CyranoB/department-of-prose/issues/8)
+for the remaining extraction work.
+
 ## Evaluation
 
 The repository includes a two-layer evaluation set: deterministic regression
 fixtures for measurements, extraction, CLI behavior, wrapper behavior, and the
-exact pinned scorer; plus rubric-reviewed golden rewrite cases for contextual
-judgment, fact preservation, and voice. Run the deterministic suite with:
+exact pinned scorer; plus golden rewrite cases for rubric-based review of
+contextual judgment, fact preservation, and voice. CI validates the golden-case
+schemas without running a model or judging rewrites; editorial verdicts require
+separate recorded reviews. Run the deterministic suite with:
 
 ```bash
 npm ci
